@@ -102,7 +102,7 @@ async function renderArchive() {
         <b>${entry.name}</b>
         <span class="mono">${entry.year} — ${entry.style || ""}</span>
         <span class="mono">${entry.category || ""}</span>
-        <span class="mono">${entry.status || ""} · ${entry.versions.length} version${entry.versions.length === 1 ? "" : "s"}</span>
+        <span class="mono">${entry.status || ""}${entry.versions.length > 1 ? ` · ${entry.versions.length} versions` : ""}</span>
         <span class="mono glyphs">…</span>
       </div>`;
     list.appendChild(row);
@@ -149,7 +149,9 @@ async function renderFont(id, vi) {
         <div><span class="mono">Glyphs</span>${font.glyphs.length}</div>
         <div><span class="mono">UPM</span>${font.unitsPerEm}</div>
         <div><span class="mono">Version</span>
-          <select id="ver">${entry.versions.map((v, i) => `<option value="${i}" ${i === vi ? "selected" : ""}>${v.label}${v.date ? " · " + v.date : ""}</option>`).join("")}</select>
+          ${entry.versions.length > 1
+            ? `<select id="ver">${entry.versions.map((v, i) => `<option value="${i}" ${i === vi ? "selected" : ""}>${v.label}${v.date ? " · " + v.date : ""}</option>`).join("")}</select>`
+            : `${entry.versions[0].label}${entry.versions[0].date ? " · " + entry.versions[0].date : ""}`}
         </div>
       </div>
       ${entry.description ? `<p class="desc">${entry.description}</p>` : ""}
@@ -203,7 +205,7 @@ async function renderFont(id, vi) {
       <div class="glyph-grid" id="grid"></div>
     </section>`;
 
-  $("#ver").onchange = (e) => (location.hash = `#/font/${id}/${e.target.value}`);
+  if ($("#ver")) $("#ver").onchange = (e) => (location.hash = `#/font/${id}/${e.target.value}`);
   setupTester(entry);
   const editor = setupEditor(rec, entry);
   setupGrid(rec, editor);
@@ -547,7 +549,11 @@ function setupEditor(rec, entry) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
-  new ResizeObserver(() => glyph && draw()).observe(canvas);
+  const ro = new ResizeObserver(() => {
+    if (!document.body.contains(svg)) return ro.disconnect(); // page was re-rendered
+    if (glyph && canvas.clientHeight) draw();
+  });
+  ro.observe(canvas);
 
   // wheel / pinch zoom around the cursor, double-click empty space to fit
   svg.addEventListener("wheel", (e) => {

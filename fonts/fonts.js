@@ -13,8 +13,7 @@ window.FONTS = [
     description:
       "Linie는 2026 라틴 타입 디자인 과정에서 그린 휴머니스트 산세리프입니다. (← 이 설명은 fonts/fonts.js에서 직접 고쳐 쓰세요: 콘셉트, 레퍼런스, 고민한 점 등)",
     versions: [
-      { label: "0217", file: "fonts/linie/Linie0217-Light.otf", date: "2026-03-02" },
-      { label: "first", file: "fonts/linie/Linie-Light.otf", date: "2026-02-23" },
+      { label: "Final", file: "fonts/linie/Linie0217-Light.otf", date: "2026-03-02" },
     ],
   },
 ];
